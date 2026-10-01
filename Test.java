@@ -3,22 +3,23 @@ public class Test {
         ComplexNumber a = new ComplexNumber(1, 2);
         ComplexNumber b = new ComplexNumber(3, 4);
 
-        ComplexNumber sum = a.add(b);
-        System.out.println("a + b = " + sum.getRe() + " + " + sum.getIm() + "i");
+        System.out.println("a = " + a);
+        System.out.println("b = " + b);
+        System.out.println("a + b = " + a.add(b));
+        System.out.println("a - b = " + a.subtract(b));
+        System.out.println("a * b = " + a.multiply(b));
+        System.out.println("a / b = " + a.divide(b));
 
-        ComplexNumber minus = a.subtract(b);
-        System.out.println("a - b = " + minus.getRe() + " + " + minus.getIm() + "i");
+        System.out.println("(3,-4) = " + new ComplexNumber(3, -4));
+        System.out.println("(5,0)  = " + new ComplexNumber(5, 0));
+        System.out.println("(0,2)  = " + new ComplexNumber(0, 2));
+        System.out.println("(0,0)  = " + new ComplexNumber(0, 0));
 
-        ComplexNumber mult = a.multiply(b);
-        System.out.println("a * b = " + mult.getRe() + " + " + mult.getIm() + "i");
-
-        ComplexNumber i = new ComplexNumber(0, 1);
-        ComplexNumber ii = i.multiply(i);
-        System.out.println("i * i = " + ii.getRe() + " + " + ii.getIm() + "i");
-
-        ComplexNumber p = new ComplexNumber(1, 1);
-        ComplexNumber q = new ComplexNumber(1, -1);
-        ComplexNumber pq = p.multiply(q);
-        System.out.println("(1+i)(1-i) = " + pq.getRe() + " + " + pq.getIm() + "i");
+        try {
+            a.divide(new ComplexNumber(0, 0));
+            System.out.println("ОШИБКА: исключения не было!");
+        } catch (ArithmeticException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
