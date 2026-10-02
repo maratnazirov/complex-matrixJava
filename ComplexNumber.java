@@ -1,3 +1,5 @@
+import java.util.Locale;
+
 public class ComplexNumber {
 
     private final double re;
@@ -66,6 +68,6 @@ public class ComplexNumber {
         if (value == Math.floor(value) && !Double.isInfinite(value)) {
             return String.valueOf((long) value);
         }
-        return String.format("%.3f", value);
+        return String.format(Locale.US, "%.3f", value);
     }
 }
