@@ -57,6 +57,26 @@ public class ComplexMatrix {
         return result;
     }
 
+    /** Умножение матриц (число столбцов this должно равняться числу строк other). */
+    public ComplexMatrix multiply(ComplexMatrix other) {
+        if (this.cols != other.rows) {
+            throw new IllegalArgumentException(
+                    "Несовместимые размеры для умножения: (" + rows + "x" + cols + ") и ("
+                            + other.rows + "x" + other.cols + ")");
+        }
+        ComplexMatrix result = new ComplexMatrix(this.rows, other.cols);
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < other.cols; j++) {
+                ComplexNumber sum = ComplexNumber.ZERO;
+                for (int k = 0; k < this.cols; k++) {
+                    sum = sum.add(this.data[i][k].multiply(other.data[k][j]));
+                }
+                result.data[i][j] = sum;
+            }
+        }
+        return result;
+    }
+
     private void checkSameSize(ComplexMatrix other, String operation) {
         if (this.rows != other.rows || this.cols != other.cols) {
             throw new IllegalArgumentException(
