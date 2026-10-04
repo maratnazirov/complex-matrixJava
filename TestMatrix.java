@@ -12,21 +12,21 @@ public class TestMatrix {
     }
 
     public static void main(String[] args) {
-        // ===== День 3: конструктор, add, transpose =====
+        // Тесты конструктора, сложения и транспонирования
 
         // Новая матрица должна быть заполнена нулями
         ComplexMatrix z = new ComplexMatrix(2, 3);
         System.out.println("Нулевая 2x3:");
         z.print();
 
-        // A = [[1, 2+i], [3, 4-i]]
+        // Матрица A: первая строка 1 и 2+i, вторая строка 3 и 4-i
         ComplexMatrix a = new ComplexMatrix(2, 2);
         a.set(0, 0, new ComplexNumber(1, 0));
         a.set(0, 1, new ComplexNumber(2, 1));
         a.set(1, 0, new ComplexNumber(3, 0));
         a.set(1, 1, new ComplexNumber(4, -1));
 
-        // B = [[1, i], [2, 3]]
+        // Матрица B: первая строка 1 и i, вторая строка 2 и 3
         ComplexMatrix b = new ComplexMatrix(2, 2);
         b.set(0, 0, new ComplexNumber(1, 0));
         b.set(0, 1, new ComplexNumber(0, 1));
@@ -40,14 +40,14 @@ public class TestMatrix {
         System.out.println("A транспонированная:");
         a.transpose().print();
 
-        // C = [[1, 2, 3], [4, 5, 6]] (2x3)
+        // Матрица C размером 2x3: первая строка 1, 2, 3, вторая строка 4, 5, 6
         ComplexMatrix c = real(new double[][]{{1, 2, 3}, {4, 5, 6}});
         System.out.println("C (2x3):");
         c.print();
         System.out.println("C транспонированная (3x2):");
         c.transpose().print();
 
-        // Проверки ошибок из дня 3
+        // Проверки ошибок для сложения и конструктора
         try {
             a.add(c);
             System.out.println("ОШИБКА: сложение 2x2 и 2x3 должно быть запрещено!");
@@ -61,14 +61,14 @@ public class TestMatrix {
             System.out.println("Поймано: " + e.getMessage());
         }
 
-        // ===== День 4: multiply =====
+        // Тесты умножения
         System.out.println();
-        System.out.println("----- Умножение -----");
+        System.out.println("Умножение:");
 
-        // D = [[1, 2], [3, 4], [5, 6]] (3x2)
+        // Матрица D размером 3x2: строки 1 и 2, 3 и 4, 5 и 6
         ComplexMatrix d = real(new double[][]{{1, 2}, {3, 4}, {5, 6}});
 
-        // Неквадратные: (2x3) * (3x2) = (2x2), и наоборот (3x3)
+        // Неквадратные матрицы: 2x3 на 3x2 дают 2x2, а 3x2 на 2x3 дают 3x3
         System.out.println("C * D (2x2):");
         c.multiply(d).print();
         System.out.println("D * C (3x3):");
@@ -82,13 +82,42 @@ public class TestMatrix {
         ComplexMatrix e = new ComplexMatrix(2, 2);
         e.set(0, 0, ComplexNumber.ONE);
         e.set(1, 1, ComplexNumber.ONE);
-        System.out.println("A * E (должно быть равно A):");
+        System.out.println("A * E (должно получиться A):");
         a.multiply(e).print();
 
-        // Несовместимые размеры: (2x3) * (2x2)
+        // Несовместимые размеры: 2x3 на 2x2
         try {
             c.multiply(a);
             System.out.println("ОШИБКА: умножение 2x3 на 2x2 должно быть запрещено!");
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Поймано: " + ex.getMessage());
+        }
+
+        // Тесты определителя
+        System.out.println();
+        System.out.println("Определитель:");
+
+        System.out.println("1x1 [[5]]: " + real(new double[][]{{5}}).determinant());
+        System.out.println("2x2 [[1,2],[3,4]]: " + real(new double[][]{{1, 2}, {3, 4}}).determinant());
+        System.out.println("3x3 [[1,2,3],[4,5,6],[7,8,10]]: "
+                + real(new double[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 10}}).determinant());
+        System.out.println("3x3 вырожденная [[1,2,3],[4,5,6],[7,8,9]]: "
+                + real(new double[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}).determinant());
+        System.out.println("3x3 единичная: "
+                + real(new double[][]{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}).determinant());
+        System.out.println("4x4 диагональная 2,3,4,5: "
+                + real(new double[][]{{2, 0, 0, 0}, {0, 3, 0, 0}, {0, 0, 4, 0}, {0, 0, 0, 5}}).determinant());
+
+        // Комплексные матрицы A и B из начала файла
+        System.out.println("det A: " + a.determinant());
+        System.out.println("det B: " + b.determinant());
+        System.out.println("det(A*B): " + a.multiply(b).determinant());
+        System.out.println("det A * det B: " + a.determinant().multiply(b.determinant()));
+
+        // Неквадратная матрица C (2x3)
+        try {
+            c.determinant();
+            System.out.println("ОШИБКА: для 2x3 должно быть исключение!");
         } catch (IllegalArgumentException ex) {
             System.out.println("Поймано: " + ex.getMessage());
         }

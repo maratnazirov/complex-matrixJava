@@ -77,6 +77,49 @@ public class ComplexMatrix {
         return result;
     }
 
+    /** Определитель матрицы (только для квадратных матриц), рекурсивное разложение по первой строке. */
+    public ComplexNumber determinant() {
+        if (rows != cols) {
+            throw new IllegalArgumentException("Определитель определён только для квадратных матриц");
+        }
+        return determinantRecursive(data, rows);
+    }
+
+    private static ComplexNumber determinantRecursive(ComplexNumber[][] m, int n) {
+        if (n == 1) {
+            return m[0][0];
+        }
+        if (n == 2) {
+            return m[0][0].multiply(m[1][1]).subtract(m[0][1].multiply(m[1][0]));
+        }
+        ComplexNumber result = ComplexNumber.ZERO;
+        for (int col = 0; col < n; col++) {
+            ComplexNumber[][] minor = getMinor(m, 0, col, n);
+            ComplexNumber term = m[0][col].multiply(determinantRecursive(minor, n - 1));
+            if (col % 2 == 1) {
+                term = ComplexNumber.ZERO.subtract(term);
+            }
+            result = result.add(term);
+        }
+        return result;
+    }
+
+    private static ComplexNumber[][] getMinor(ComplexNumber[][] m, int skipRow, int skipCol, int n) {
+        ComplexNumber[][] minor = new ComplexNumber[n - 1][n - 1];
+        int mi = 0;
+        for (int i = 0; i < n; i++) {
+            if (i == skipRow) continue;
+            int mj = 0;
+            for (int j = 0; j < n; j++) {
+                if (j == skipCol) continue;
+                minor[mi][mj] = m[i][j];
+                mj++;
+            }
+            mi++;
+        }
+        return minor;
+    }
+
     private void checkSameSize(ComplexMatrix other, String operation) {
         if (this.rows != other.rows || this.cols != other.cols) {
             throw new IllegalArgumentException(
