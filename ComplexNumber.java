@@ -46,6 +46,14 @@ public class ComplexNumber {
         return new ComplexNumber(newRe, newIm);
     }
 
+    public double magnitude() {
+        return Math.sqrt(re * re + im * im);
+    }
+
+    public boolean isZero() {
+        return re == 0 && im == 0;
+    }
+
     @Override
     public String toString() {
         if (im == 0) {

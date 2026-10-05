@@ -121,5 +121,47 @@ public class TestMatrix {
         } catch (IllegalArgumentException ex) {
             System.out.println("Поймано: " + ex.getMessage());
         }
+                // Тесты обратной матрицы и деления
+        System.out.println();
+        System.out.println("Обратная матрица и деление:");
+
+        ComplexMatrix m = real(new double[][]{{2, 1}, {5, 3}});
+        System.out.println("Обратная к [[2,1],[5,3]]:");
+        m.inverse().print();
+        System.out.println("M * обратная к M:");
+        m.multiply(m.inverse()).print();
+
+        ComplexMatrix half = real(new double[][]{{2, 0}, {0, 4}});
+        System.out.println("Обратная к [[2,0],[0,4]]:");
+        half.inverse().print();
+
+        System.out.println("A / B:");
+        a.divide(b).print();
+        System.out.println("A / B, умноженная на B (должно получиться A):");
+        a.divide(b).multiply(b).print();
+
+        // Вырожденная матрица
+        try {
+            real(new double[][]{{1, 2}, {2, 4}}).inverse();
+            System.out.println("ОШИБКА: вырожденная матрица должна давать исключение!");
+        } catch (ArithmeticException ex) {
+            System.out.println("Поймано: " + ex.getMessage());
+        }
+
+        // Неквадратная матрица
+        try {
+            c.inverse();
+            System.out.println("ОШИБКА: для 2x3 должно быть исключение!");
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Поймано: " + ex.getMessage());
+        }
+
+        // Деление на неквадратную матрицу
+        try {
+            a.divide(c);
+            System.out.println("ОШИБКА: делитель 2x3 должен давать исключение!");
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Поймано: " + ex.getMessage());
+        }
     }
 }
