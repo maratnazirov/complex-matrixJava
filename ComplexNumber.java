@@ -1,6 +1,10 @@
 import java.util.Locale;
+import java.util.Objects;
 
 public class ComplexNumber {
+
+    public static final ComplexNumber ZERO = new ComplexNumber(0, 0);
+    public static final ComplexNumber ONE = new ComplexNumber(1, 0);
 
     private final double re;
     private final double im;
@@ -9,10 +13,6 @@ public class ComplexNumber {
         this.re = re;
         this.im = im;
     }
-
-    public static final ComplexNumber ZERO = new ComplexNumber(0, 0);
-    public static final ComplexNumber ONE = new ComplexNumber(1, 0);
-
 
     public double getRe() {
         return re;
@@ -55,6 +55,19 @@ public class ComplexNumber {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ComplexNumber that = (ComplexNumber) o;
+        return Double.compare(that.re, re) == 0 && Double.compare(that.im, im) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(re, im);
+    }
+
+    @Override
     public String toString() {
         if (im == 0) {
             return formatNumber(re);
@@ -62,19 +75,13 @@ public class ComplexNumber {
         if (re == 0) {
             return formatNumber(im) + "i";
         }
-        String sign; 
-
-        if (im < 0) {
-            sign = "-"; 
-        } else {
-            sign = "+"; 
-        }
+        String sign = (im < 0) ? "-" : "+";
         return formatNumber(re) + sign + formatNumber(Math.abs(im)) + "i";
     }
 
     private String formatNumber(double value) {
-        if (value == Math.floor(value) && !Double.isInfinite(value)) {
-            return String.valueOf((long) value);
+        if (Math.abs(value - Math.round(value)) < 1e-9) {
+            return String.valueOf(Math.round(value));
         }
         return String.format(Locale.US, "%.3f", value);
     }

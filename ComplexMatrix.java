@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class ComplexMatrix {
 
     private final int rows;
@@ -34,7 +36,6 @@ public class ComplexMatrix {
         data[i][j] = value;
     }
 
-     /** Сложение матриц (размеры должны совпадать). */
     public ComplexMatrix add(ComplexMatrix other) {
         checkSameSize(other, "сложения");
         ComplexMatrix result = new ComplexMatrix(rows, cols);
@@ -46,28 +47,17 @@ public class ComplexMatrix {
         return result;
     }
 
-    public ComplexMatrix divide(ComplexMatrix other) {
-        if (other.rows != other.cols) {
-            throw new IllegalArgumentException("Делитель должен быть квадратной матрицей");
-        }
-        if (this.cols != other.rows) {
-            throw new IllegalArgumentException("Несовместимые размеры для деления матриц");
-        }
-        return this.multiply(other.inverse());
-    }
-
-    /** Транспонирование матрицы. */
-    public ComplexMatrix transpose() {
-        ComplexMatrix result = new ComplexMatrix(cols, rows);
+    public ComplexMatrix subtract(ComplexMatrix other) {
+        checkSameSize(other, "вычитания");
+        ComplexMatrix result = new ComplexMatrix(rows, cols);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                result.data[j][i] = this.data[i][j];
+                result.data[i][j] = this.data[i][j].subtract(other.data[i][j]);
             }
         }
         return result;
     }
 
-    /** Умножение матриц (число столбцов this должно равняться числу строк other). */
     public ComplexMatrix multiply(ComplexMatrix other) {
         if (this.cols != other.rows) {
             throw new IllegalArgumentException(
@@ -87,7 +77,27 @@ public class ComplexMatrix {
         return result;
     }
 
-    /** Определитель матрицы (только для квадратных матриц), рекурсивное разложение по первой строке. */
+    public ComplexMatrix divide(ComplexMatrix other) {
+        if (other.rows != other.cols) {
+            throw new IllegalArgumentException("Делитель должен быть квадратной матрицей");
+        }
+        if (this.cols != other.rows) {
+            throw new IllegalArgumentException("Несовместимые размеры для деления матриц");
+        }
+        return this.multiply(other.inverse());
+    }
+
+    public ComplexMatrix transpose() {
+        ComplexMatrix result = new ComplexMatrix(cols, rows);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                result.data[j][i] = this.data[i][j];
+            }
+        }
+        return result;
+    }
+
+    // Определитель рекурсивным разложением по первой строке
     public ComplexNumber determinant() {
         if (rows != cols) {
             throw new IllegalArgumentException("Определитель определён только для квадратных матриц");
@@ -130,18 +140,14 @@ public class ComplexMatrix {
         return minor;
     }
 
-    /** Обратная матрица методом Гаусса-Жордана (с выбором ведущего элемента по модулю). */
+    // Обращение матрицы методом Гаусса-Жордана с выбором ведущего элемента
     public ComplexMatrix inverse() {
         if (rows != cols) {
             throw new IllegalArgumentException("Обратная матрица определена только для квадратных матриц");
         }
         int n = rows;
-        ComplexNumber det = determinant();
-        if (det.isZero()) {
-            throw new ArithmeticException("Матрица вырождена (определитель равен 0), обратной не существует");
-        }
 
-        // Формируем расширенную матрицу [A | E]
+        // Строим расширенную матрицу [A | E]
         ComplexNumber[][] aug = new ComplexNumber[n][2 * n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
@@ -153,6 +159,7 @@ public class ComplexMatrix {
         }
 
         for (int col = 0; col < n; col++) {
+            // Ищем строку с максимальным по модулю элементом в текущем столбце
             int pivotRow = col;
             double maxMag = aug[col][col].magnitude();
             for (int r = col + 1; r < n; r++) {
@@ -165,15 +172,19 @@ public class ComplexMatrix {
             if (maxMag == 0) {
                 throw new ArithmeticException("Матрица вырождена, обратной не существует");
             }
+
+            // Меняем строки местами
             ComplexNumber[] tmp = aug[col];
             aug[col] = aug[pivotRow];
             aug[pivotRow] = tmp;
 
+            // Нормализуем ведущую строку
             ComplexNumber pivot = aug[col][col];
             for (int j = 0; j < 2 * n; j++) {
                 aug[col][j] = aug[col][j].divide(pivot);
             }
 
+            // Зануляем остальные строки в этом столбце
             for (int r = 0; r < n; r++) {
                 if (r == col) continue;
                 ComplexNumber factor = aug[r][col];
@@ -184,6 +195,7 @@ public class ComplexMatrix {
             }
         }
 
+        // Извлекаем правую половину [E | A^-1]
         ComplexMatrix result = new ComplexMatrix(n, n);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
@@ -196,19 +208,57 @@ public class ComplexMatrix {
     private void checkSameSize(ComplexMatrix other, String operation) {
         if (this.rows != other.rows || this.cols != other.cols) {
             throw new IllegalArgumentException(
-                    "Матрицы должны быть одинакового размера для операции: " + operation);
+                    "Матрицы должны быть одинакового размера для " + operation);
         }
     }
-    
-    public void print() {
+
+    // Генерация случайной матрицы с целыми числами в диапазоне [minVal, maxVal]
+    public static ComplexMatrix random(int rows, int cols, int minVal, int maxVal) {
+        Random rnd = new Random();
+        ComplexMatrix matrix = new ComplexMatrix(rows, cols);
+        int range = Math.max(1, maxVal - minVal + 1);
+
         for (int i = 0; i < rows; i++) {
-            StringBuilder sb = new StringBuilder("| ");
             for (int j = 0; j < cols; j++) {
-                sb.append(data[i][j].toString());
-                if (j < cols - 1) sb.append("\t");
+                double re = rnd.nextInt(range) + minVal;
+                double im = rnd.nextInt(range) + minVal;
+                matrix.set(i, j, new ComplexNumber(re, im));
             }
-            sb.append(" |");
-            System.out.println(sb);
         }
+        return matrix;
+    }
+
+    @Override
+    public String toString() {
+        // Подготавливаем строковое представление всех элементов и считаем ширину каждого столбца
+        String[][] str = new String[rows][cols];
+        int[] colWidths = new int[cols];
+
+        for (int j = 0; j < cols; j++) {
+            for (int i = 0; i < rows; i++) {
+                str[i][j] = data[i][j].toString();
+                if (str[i][j].length() > colWidths[j]) {
+                    colWidths[j] = str[i][j].length();
+                }
+            }
+        }
+
+        // Формируем красивую ровную таблицу
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < rows; i++) {
+            sb.append("| ");
+            for (int j = 0; j < cols; j++) {
+                sb.append(String.format("%" + colWidths[j] + "s", str[i][j]));
+                if (j < cols - 1) {
+                    sb.append("   ");
+                }
+            }
+            sb.append(" |\n");
+        }
+        return sb.toString();
+    }
+
+    public void print() {
+        System.out.print(this);
     }
 }
